@@ -2,6 +2,7 @@ import { db } from '@/lib/db/client'
 import { invoices, payments, webhookLogs } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { DEMO_MODE } from '@/lib/env'
+import { getSessionMerchant } from '@/lib/session'
 
 async function simulatePay(id: string) {
   'use server'
@@ -9,10 +10,12 @@ async function simulatePay(id: string) {
 }
 
 export default async function InvoiceDetail({ params }: { params: { id: string } }) {
+  const me = await getSessionMerchant()
+  if (!me) return <div className="p-4">Please <a className="underline" href="/signin">sign in</a>.</div>
   const [inv] = await db.select().from(invoices).where(eq(invoices.id, params.id)).limit(1)
   const txs = await db.select().from(payments).where(eq(payments.invoiceId, params.id))
   const wh = await db.select().from(webhookLogs).where(eq(webhookLogs.invoiceId, params.id))
-  if (!inv) return <div>Not found</div>
+  if (!inv || inv.merchantId !== me.id) return <div>Not found</div>
   return (
     <main className="space-y-4">
       <h1 className="text-xl font-semibold">Invoice {inv.id}</h1>

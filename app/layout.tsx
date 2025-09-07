@@ -1,6 +1,8 @@
 import './globals.css'
 import { ReactNode } from 'react'
 import { ThemeProvider } from 'next-themes'
+import { SiteHeader } from '@/components/SiteHeader'
+import { SiteFooter } from '@/components/SiteFooter'
 
 export const metadata = {
   title: 'nonamepay',
@@ -13,18 +15,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <div className="mx-auto max-w-6xl px-4 py-6">
-            <header className="flex items-center justify-between mb-6">
-              <a href="/" className="font-bold">nonamepay</a>
-              <nav className="flex gap-4 text-sm">
-                <a href="/docs">Docs</a>
-                <a href="/dashboard">Dashboard</a>
-              </nav>
-            </header>
+            <SiteHeader />
             {children}
+            <SiteFooter />
           </div>
         </ThemeProvider>
       </body>
     </html>
   )
 }
-

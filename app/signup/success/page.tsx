@@ -1,7 +1,8 @@
 "use client"
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-export default function SignupSuccess() {
+function SignupSuccessInner() {
   const sp = useSearchParams()
   const apiKey = sp.get('apiKey')
   return (
@@ -22,3 +23,10 @@ export default function SignupSuccess() {
   )
 }
 
+export default function SignupSuccess() {
+  return (
+    <Suspense fallback={null}>
+      <SignupSuccessInner />
+    </Suspense>
+  )
+}

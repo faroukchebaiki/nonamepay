@@ -1,12 +1,12 @@
-import { NextRequest } from 'next/server'
+// Using Web standard Request in Route Handlers
 import { db } from '@/lib/db/client'
 import { invoices, payments } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { json, notFound, withRateLimit } from '@/lib/http'
 
-export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
+export async function GET(req: Request, { params }: any) {
   await withRateLimit(req)
-  const id = ctx.params.id
+  const id = params.id
   const rows = await db.select().from(invoices).where(eq(invoices.id, id)).limit(1)
   const inv = rows[0]
   if (!inv) return notFound()
@@ -23,4 +23,3 @@ export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
     asset: inv.asset as 'BTC'|'XMR'
   })
 }
-

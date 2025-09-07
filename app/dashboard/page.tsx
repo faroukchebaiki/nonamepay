@@ -13,7 +13,7 @@ async function createAccount() {
   await db.insert(accounts).values({ code })
 }
 
-export default async function DashboardPage({ searchParams }: { searchParams: { status?: string } }) {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const me = await getSessionMerchant()
   if (!me) {
     return (
@@ -23,7 +23,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: { 
       </main>
     )
   }
-  const status = searchParams.status as any
+  const { status } = await searchParams
   const rows = await db.select().from(invoices).where(eq(invoices.merchantId, me.id)).orderBy(desc(invoices.createdAt)).limit(50)
   const acct = await db.select().from(accounts).orderBy(desc(accounts.createdAt)).limit(5)
   const items = status ? rows.filter(r => r.status === status) : rows

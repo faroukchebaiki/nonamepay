@@ -9,12 +9,13 @@ async function simulatePay(id: string) {
   await fetch(`${process.env.APP_BASE_URL || 'http://localhost:3000'}/api/invoices/${id}/simulate-pay`, { method: 'POST' })
 }
 
-export default async function InvoiceDetail({ params }: { params: { id: string } }) {
+export default async function InvoiceDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const me = await getSessionMerchant()
   if (!me) return <div className="p-4">Please <a className="underline" href="/signin">sign in</a>.</div>
-  const [inv] = await db.select().from(invoices).where(eq(invoices.id, params.id)).limit(1)
-  const txs = await db.select().from(payments).where(eq(payments.invoiceId, params.id))
-  const wh = await db.select().from(webhookLogs).where(eq(webhookLogs.invoiceId, params.id))
+  const [inv] = await db.select().from(invoices).where(eq(invoices.id, id)).limit(1)
+  const txs = await db.select().from(payments).where(eq(payments.invoiceId, id))
+  const wh = await db.select().from(webhookLogs).where(eq(webhookLogs.invoiceId, id))
   if (!inv || inv.merchantId !== me.id) return <div>Not found</div>
   return (
     <main className="space-y-4">
